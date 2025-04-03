@@ -3,14 +3,15 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Declaración del componente TablaCategorias que recibe props
-const TablaProducto = ({ productos, cargando, error }) => {
-  // Renderizado condicional según el estado recibido por props
+const Tablaproducto = ({ productos, cargando, error }) => {
+
   if (cargando) {
     return <div>Cargando productos...</div>; // Muestra mensaje mientras carga
   }
+
+  //Borrar la línea si a caso.
   if (error) {
-    return <div>Error: {error}</div>;         // Muestra error si ocurre
+    return <div>Error: {error}</div>;        // Muestra error si ocurre
   }
 
   // Renderizado de la tabla con los datos recibidos
@@ -18,26 +19,33 @@ const TablaProducto = ({ productos, cargando, error }) => {
     <Table striped bordered hover responsive>
       <thead>
         <tr>
-          <th>ID producto</th>
-          <th>Nombre de producto</th>
-          <th>Descripcion del producto</th>
-          <th>ID categoria</th>
+          <th>ID Producto</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>ID Categoría</th>
           <th>Precio Unitario</th>
           <th>Stock</th>
-          <th>imagen</th>
+          <th>Imagen</th>
         </tr>
       </thead>
       <tbody>
-      {productos.map((producto) => (
+        {productos.map((producto) => (
           <tr key={producto.id_producto}>
-          <td>{producto.id_producto}</td>
-          <td>{producto.nombre_producto}</td>
-          <td>{producto.descripcion_producto}</td>
-          <td>{producto.id_categoria}</td>
-          <td>{producto.precio_unitario}</td>
-          <td>{producto.stock}</td>
-          <td>{producto.imagen}</td>
-                
+            <td>{producto.id_producto}</td>
+            <td>{producto.nombre_producto}</td>
+            <td>{producto.descripcion_producto || 'Sin descripción'}</td>
+            <td>{producto.id_categoria}</td>
+            <td>{producto.precio_unitario.toFixed(2)}</td>
+            <td>{producto.stock}</td>
+            <td>
+              {producto.imagen ? (
+                <a href={producto.imagen} target="_blank" rel="noopener noreferrer">
+                  Ver imagen
+                </a>
+              ) : (
+                'Sin imagen'
+              )}
+            </td>
           </tr>
         ))}
       </tbody>
@@ -46,4 +54,4 @@ const TablaProducto = ({ productos, cargando, error }) => {
 };
 
 // Exportación del componente
-export default TablaProducto;
+export default Tablaproducto;
