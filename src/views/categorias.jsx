@@ -4,6 +4,7 @@ import TablaCategorias from '../components/categoria/tablacategoria';
 import { Container, Button, Row, Col } from "react-bootstrap";
 import ModalRegistroCategoria from '../components/categoria/ModalRegistroCategoria';
 import CuadroBusquedas from '../components/busquedas/busquedas';
+import Paginacion from '../components/ordenamiento/Paginacion';
 
 // Declaración del componente Categorias
 const Categorias = () => {
@@ -18,7 +19,8 @@ const Categorias = () => {
   });
   const [categoriasFiltradas, setCategoriasFiltradas] = useState([]);
   const [textoBusqueda, setTextoBusqueda] = useState("");
-
+  const [paginaActual, establecerPaginaActual] = useState(1);
+  const elementosPorPagina = 5; // Número de elementos por página
 
   const obtenerCategorias = async () => { // Método renombrado a español
       try {
@@ -93,6 +95,11 @@ const manejarCambioBusqueda = (e) => {
   setCategoriasFiltradas(filtradas);
 };
 
+const categoriasPaginadas = categoriasFiltradas.slice(
+  (paginaActual - 1) * elementosPorPagina,
+  paginaActual * elementosPorPagina
+);
+
 
 
   // Renderizado de la vista
@@ -117,14 +124,24 @@ const manejarCambioBusqueda = (e) => {
     </Col>
   </Row>
         <br/><br/>
+   
 
         {/* Pasa los estados como props al componente TablaCategorias */}
         <TablaCategorias 
-    categorias={categoriasFiltradas} 
+    categorias={categoriasPaginadas} 
     cargando={cargando} 
-    error={errorCarga} 
+    error={errorCarga}
+    totalElementos={listaCategorias.length} // Total de elementos
+    elementosPorPagina={elementosPorPagina} // Elementos por página
+    paginaActual={paginaActual} // Página actual
+    establecerPaginaActual={establecerPaginaActual} // Método para cambiar página
   />
-
+ <Paginacion
+  elementosPorPagina={elementosPorPagina}
+  totalElementos={categoriasFiltradas.length}
+  paginaActual={paginaActual}
+  establecerPaginaActual={establecerPaginaActual}
+/>
 
       <ModalRegistroCategoria
           mostrarModal={mostrarModal}
@@ -137,7 +154,10 @@ const manejarCambioBusqueda = (e) => {
 
       </Container>
     </>
+
+
   );
+
 };
 
 // Exportación del componente
