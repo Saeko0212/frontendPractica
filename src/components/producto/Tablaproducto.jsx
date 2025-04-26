@@ -1,9 +1,11 @@
 // Importaciones necesarias para el componente visual
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Paginacion from '../ordenamiento/Paginacion';
 
-const Tablaproducto = ({ productos, cargando, error }) => {
+const Tablaproducto = ({ productos, cargando, error,abrirModalEliminacion,totalElementos,
+  elementosPorPagina, paginaActual, establecerPaginaActual, abrirModalEdicion }) => {
 
   if (cargando) {
     return <div>Cargando productos...</div>; // Muestra mensaje mientras carga
@@ -16,6 +18,7 @@ const Tablaproducto = ({ productos, cargando, error }) => {
 
   // Renderizado de la tabla con los datos recibidos
   return (
+    <>
     <Table striped bordered hover responsive>
       <thead>
         <tr>
@@ -26,6 +29,7 @@ const Tablaproducto = ({ productos, cargando, error }) => {
           <th>Precio Unitario</th>
           <th>Stock</th>
           <th>Imagen</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +42,7 @@ const Tablaproducto = ({ productos, cargando, error }) => {
             <td>{producto.precio_unitario.toFixed(2)}</td>
             <td>{producto.stock}</td>
             <td>
+              
               {producto.imagen ? (
                 <a href={producto.imagen} target="_blank" rel="noopener noreferrer">
                   Ver imagen
@@ -46,10 +51,37 @@ const Tablaproducto = ({ productos, cargando, error }) => {
                 'Sin imagen'
               )}
             </td>
+            <td>
+<Button
+variant="outline-danger"
+size="sm"
+onClick={() => abrirModalEliminacion(producto)}
+>
+<i className="bi bi-trash"></i>
+</Button>
+<h>  </h>
+<Button
+                  variant="outline-warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => abrirModalEdicion(producto)}
+                >
+                  <i className="bi bi-pencil"></i>
+                </Button>
+</td>           
           </tr>
         ))}
       </tbody>
     </Table>
+
+    <Paginacion
+  elementosPorPagina={elementosPorPagina}
+  totalElementos={totalElementos}
+  paginaActual={paginaActual}
+  establecerPaginaActual={establecerPaginaActual}
+/>
+    
+    </>
   );
 };
 

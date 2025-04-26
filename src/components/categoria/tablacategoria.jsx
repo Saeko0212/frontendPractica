@@ -1,11 +1,14 @@
 // Importaciones necesarias para el componente visual
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Paginacion from '../ordenamiento/Paginacion';
 
 // Declaración del componente TablaCategorias que recibe props
-const TablaCategorias = ({ categorias, cargando, error,abrirModalEliminacion,abrirModalEdicion }) => {
+const TablaCategorias = ({ categorias, cargando, error,totalElementos,
+  elementosPorPagina,
+  paginaActual,
+  establecerPaginaActual,abrirModalEliminacion,abrirModalEdicion }) => {
   // Renderizado condicional según el estado recibido por props
   if (cargando) {
     return <div>Cargando categorías...</div>; // Muestra mensaje mientras carga
@@ -16,6 +19,7 @@ const TablaCategorias = ({ categorias, cargando, error,abrirModalEliminacion,abr
 
   // Renderizado de la tabla con los datos recibidos
   return (
+    <>
     <Table striped bordered hover responsive>
       <thead>
         <tr>
@@ -39,6 +43,7 @@ const TablaCategorias = ({ categorias, cargando, error,abrirModalEliminacion,abr
                 >
                   <i className="bi bi-trash"></i>
                 </Button>
+                <h>   </h>
                 <Button
                   variant="outline-warning"
                   size="sm"
@@ -53,6 +58,15 @@ const TablaCategorias = ({ categorias, cargando, error,abrirModalEliminacion,abr
         ))}
       </tbody>
     </Table>
+    <Paginacion
+  elementosPorPagina={elementosPorPagina}
+  totalElementos={totalElementos}
+  paginaActual={paginaActual}
+  establecerPaginaActual={establecerPaginaActual}
+/>
+ 
+    </>
+    
   );
 };
 

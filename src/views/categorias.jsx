@@ -4,7 +4,6 @@ import TablaCategorias from '../components/categoria/tablacategoria';
 import { Container, Button, Row, Col } from "react-bootstrap";
 import ModalRegistroCategoria from '../components/categoria/ModalRegistroCategoria';
 import CuadroBusquedas from '../components/busquedas/busquedas';
-import Paginacion from '../components/ordenamiento/Paginacion';
 import ModalEliminacionCategoria from '../components/categoria/ModalEliminacionCategoria';
 import ModalEdicionCategoria from '../components/categoria/ModalActualizacionCategoria';
 
@@ -128,10 +127,6 @@ const abrirModalEliminacion = (categoria) => {
 };
 
 
-const categoriasPaginadas = categoriasFiltradas.slice(
-  (paginaActual - 1) * elementosPorPagina,
-  paginaActual * elementosPorPagina
-);
 
 const manejarCambioInputEdicion = (e) => {
   const { name, value } = e.target;
@@ -178,6 +173,11 @@ const abrirModalEdicion = (categoria) => {
   setMostrarModalEdicion(true);
 };
 
+const categoriasPaginadas = categoriasFiltradas.slice(
+  (paginaActual - 1) * elementosPorPagina,
+  paginaActual * elementosPorPagina
+);
+
 
   // Renderizado de la vista
   return (
@@ -205,12 +205,7 @@ const abrirModalEdicion = (categoria) => {
 
         {/* Pasa los estados como props al componente TablaCategorias */}
      
- <Paginacion
-  elementosPorPagina={elementosPorPagina}
-  totalElementos={categoriasFiltradas.length}
-  paginaActual={paginaActual}
-  establecerPaginaActual={establecerPaginaActual}
-/>
+
 <ModalEliminacionCategoria
           mostrarModalEliminacion={mostrarModalEliminacion}
           setMostrarModalEliminacion={setMostrarModalEliminacion}
