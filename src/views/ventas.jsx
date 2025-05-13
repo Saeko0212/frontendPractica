@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import TablaVentas from '../components/ventas/Tablaventas';// Importa el componente de tabla
 import { Container, Button, Row, Col } from "react-bootstrap";
 import CuadroBusquedas from '../components/busquedas/busquedas';
+import ModalDetallesVenta from '../components/detalles_ventas/ModalDetallesVenta';
+import ModalEliminacionVenta from '../components/ventas/ModalEliminacionVenta';
+import ModalRegistroVenta from '../components/ventas/ModalRegistroVenta';
 
 // Declaración del componente Ventas
 const Ventas = () => {
@@ -12,27 +15,71 @@ const Ventas = () => {
   const [errorCarga, setErrorCarga] = useState(null); // Maneja errores de la petición
   const [ventasFiltradas, setVentasFiltradas] = useState([]);
   const [textoBusqueda, setTextoBusqueda] = useState("");
+const [mostrarModal, setMostrarModal] = useState(false); // Estado para el modal
+  const [detallesVenta, setDetallesVenta] = useState([]); // Estado para los detalles
+  const [cargandoDetalles, setCargandoDetalles] = useState(false); // Estado de carga de detalles
+  const [errorDetalles, setErrorDetalles] = useState(null); // Estado de error de detalles
+const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
+const [clientes, setClientes] = useState([]);
+const [empleados, setEmpleados] = useState([]);
+const [productos, setProductos] = useState([]);
+const [nuevaVenta, setNuevaVenta] = useState({
+  id_cliente: '',
+  id_empleado: '',
+  fecha_venta: new Date(),
+  total_venta: 0
+});
+const [detallesNuevos, setDetallesNuevos] = useState([]);
 
 
-  // Lógica de obtención de datos con useEffect
-  useEffect(() => {
-    const obtenerVentas = async () => {
-      try {
-        const respuesta = await fetch('http://localhost:3000/api/ventas'); // Ruta ajustada al controlador
-        if (!respuesta.ok) {
-          throw new Error('Error al cargar las ventas');
-        }
-        const datos = await respuesta.json();
-        setListaVentas(datos);    // Actualiza el estado con los datos
-        setVentasFiltradas(datos);
-        setCargando(false);       // Indica que la carga terminó
-      } catch (error) {
-        setErrorCarga(error.message); // Guarda el mensaje de error
-        setCargando(false);       // Termina la carga aunque haya error
-      }
+useEffect(() => {
+  obtenerVentas();
+  obtenerClientes();
+  obtenerEmpleados();
+  obtenerProductos();
+}, []);
+const agregarDetalle = (detalle) => {
+  setDetallesNuevos(prev => [...prev, detalle]);
+  setNuevaVenta(prev => ({
+    ...prev,
+    total_venta: prev.total_venta + (detalle.cantidad * detalle.precio_unitario)
+  }));
+};
+
+const agregarVenta = async () => {
+  if (!nuevaVenta.id_cliente || !nuevaVenta.id_empleado || !nuevaVenta.fecha_venta || detallesNuevos.length === 0) {
+    setErrorCarga("Por favor, completa todos los campos y agrega al menos un detalle.");
+    return;
+  }
+
+  try {
+    const ventaData = {
+      id_cliente: nuevaVenta.id_cliente,
+      id_empleado: nuevaVenta.id_empleado,
+      fecha_venta: nuevaVenta.fecha_venta.toISOString(),
+      total_venta: detallesNuevos.reduce((sum, d) => sum + (d.cantidad * d.precio_unitario), 0),
+      detalles: detallesNuevos
     };
-    obtenerVentas();            // Ejecuta la función al montar el componente
-  }, []);                       // Array vacío para que solo se ejecute una vez
+
+    const respuesta = await fetch('http://localhost:3000/api/registrarventa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ventaData)
+    });
+
+    if (!respuesta.ok) throw new Error('Error al registrar la venta');
+
+    await obtenerVentas();
+    setNuevaVenta({ id_cliente: '', id_empleado: '', fecha_venta: new Date(), total_venta: 0 });
+    setDetallesNuevos([]);
+    setMostrarModalRegistro(false);
+    setErrorCarga(null);
+  } catch (error) {
+    setErrorCarga(error.message);
+  }
+};
+
+                 // Array vacío para que solo se ejecute una vez
   //metodo para mejorar cambio de valores dentro del cuadro de busqueda
   const manejarCambioBusqueda = (e) => {
     const texto = e.target.value.toLowerCase();
@@ -46,6 +93,89 @@ const Ventas = () => {
     setVentasFiltradas(filtradas);
   };
 
+  // Función para obtener detalles de una venta
+  const obtenerDetalles = async (id_venta) => {
+    setCargandoDetalles(true);
+    setErrorDetalles(null);
+    try {
+      const respuesta = await fetch(`http://localhost:3000/api/obtenerdetallesventa/${id_venta}`);
+      if (!respuesta.ok) {
+        throw new Error('Error al cargar los detalles de la venta');
+      }
+      const datos = await respuesta.json();
+      setDetallesVenta(datos);
+      setCargandoDetalles(false);
+      setMostrarModal(true); // Abre el modal
+    } catch (error) {
+      setErrorDetalles(error.message);
+      setCargandoDetalles(false);
+    }
+  };
+  
+const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
+const [ventaAEliminar, setVentaAEliminar] = useState(null);
+
+const eliminarVenta = async () => {
+  if (!ventaAEliminar) return;
+
+  try {
+    const respuesta = await fetch(`http://localhost:3000/api/eliminarventa/${ventaAEliminar.id_venta}`, {
+      method: 'DELETE',
+    });
+
+    if (!respuesta.ok) {
+      throw new Error('Error al eliminar la venta');
+    }
+    
+    setMostrarModalEliminacion(false);
+    await obtenerVentas();
+    setVentaAEliminar(null);
+    setErrorCarga(null);
+  } catch (error) {
+    setErrorCarga(error.message);
+  }
+};
+
+const abrirModalEliminacion = (venta) => {
+  setVentaAEliminar(venta);
+  setMostrarModalEliminacion(true);
+};
+
+const obtenerClientes = async () => {
+  try {
+    const respuesta = await fetch('http://localhost:3000/api/clientes');
+    if (!respuesta.ok) throw new Error('Error al cargar los clientes');
+    const datos = await respuesta.json();
+    setClientes(datos);
+  } catch (error) {
+    setErrorCarga(error.message);
+  }
+};
+
+const obtenerEmpleados = async () => {
+  try {
+    const respuesta = await fetch('http://localhost:3000/api/empleados');
+    if (!respuesta.ok) throw new Error('Error al cargar los empleados');
+    const datos = await respuesta.json();
+    setEmpleados(datos);
+  } catch (error) {
+    setErrorCarga(error.message);
+  }
+};
+
+const obtenerProductos = async () => {
+  try {
+    const respuesta = await fetch('http://localhost:3000/api/productos');
+    if (!respuesta.ok) throw new Error('Error al cargar los productos');
+    const datos = await respuesta.json();
+    setProductos(datos);
+  } catch (error) {
+    setErrorCarga(error.message);
+  }
+};
+
+
+
   // Renderizado de la vista
   return (
     <>
@@ -53,11 +183,14 @@ const Ventas = () => {
         <br />
         <h4>Ventas con Detalles</h4>
         <Row>
-    <Col lg={2} md={4} sm={4} xs={5}>
-      <Button variant="primary" onClick={() => setMostrarModal(true)} style={{ width: "100%" }}>
-        Nueva venta
-      </Button>
-    </Col>
+    <Row>
+  <Col lg={2} md={4} sm={4} xs={5}>
+    <Button variant="primary" onClick={() => setMostrarModalRegistro(true)} style={{ width: "100%" }}>
+      Nueva Venta
+    </Button>
+  </Col>
+</Row>
+<br />
     <Col lg={5} md={8} sm={8} xs={7}>
       <CuadroBusquedas
         textoBusqueda={textoBusqueda}
@@ -67,11 +200,42 @@ const Ventas = () => {
   </Row>
 
         {/* Pasa los estados como props al componente TablaVentas */}
-        <TablaVentas 
-    ventas={ventasFiltradas} 
-    cargando={cargando} 
-    error={errorCarga} 
-  />
+      <TablaVentas
+  ventas={listaVentas}
+  cargando={cargando}
+  error={errorCarga}
+  obtenerDetalles={obtenerDetalles}
+  abrirModalEliminacion={abrirModalEliminacion}
+/>
+
+   <ModalDetallesVenta
+          mostrarModal={mostrarModal}
+          setMostrarModal={setMostrarModal}
+          detalles={detallesVenta}
+          cargandoDetalles={cargandoDetalles}
+          errorDetalles={errorDetalles}
+        />
+<ModalEliminacionVenta
+  mostrarModalEliminacion={mostrarModalEliminacion}
+  setMostrarModalEliminacion={setMostrarModalEliminacion}
+  eliminarVenta={eliminarVenta}
+/>
+<ModalRegistroVenta
+  mostrarModal={mostrarModalRegistro}
+  setMostrarModal={setMostrarModalRegistro}
+  nuevaVenta={nuevaVenta}
+  setNuevaVenta={setNuevaVenta}
+  detallesVenta={detallesNuevos}
+  setDetallesVenta={setDetallesNuevos}
+  agregarDetalle={agregarDetalle}
+  agregarVenta={agregarVenta}
+  errorCarga={errorCarga}
+  clientes={clientes}
+  empleados={empleados}
+  productos={productos}
+/>
+
+
       </Container>
     </>
   );
