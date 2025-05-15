@@ -46,7 +46,7 @@ const Encabezado = () => {
           style={{ cursor: "pointer" }}
         >
           <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top" />{" "}
-          <strong>Ferretería Selva</strong>
+          <strong>Ferretería Ruiz</strong>
         </Navbar.Brand>
 
         {/* Botón para alternar el menú lateral en pantallas pequeñas */}
@@ -93,6 +93,22 @@ const Encabezado = () => {
                 {estaColapsado ? <i className="bi-house-door-fill me-2"></i> : null}
                 <strong>Clientes</strong>
               </Nav.Link>
+              <Nav.Link
+                onClick={() => navegarA("/compras")}
+                className={estaColapsado ? "text-black" : "text-white"}
+              >
+                {estaColapsado ? <i className="bi-house-door-fill me-2"></i> : null}
+                <strong>Compras</strong>
+              </Nav.Link>
+
+<Nav.Link
+                onClick={() => navegarA("/Empleados")}
+                className={estaColapsado ? "text-black" : "text-white"}
+              >
+                {estaColapsado ? <i className="bi-house-door-fill me-2"></i> : null}
+                <strong>Empleados</strong>
+              </Nav.Link>
+
 
               <Nav.Link
                 onClick={() => navegarA("/usuarios")}
