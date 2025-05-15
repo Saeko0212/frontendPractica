@@ -3,7 +3,7 @@ import Tablaproducto from '../components/producto/Tablaproducto'; // Asumiendo q
 import ModalRegistroProductos from '../components/producto/ModalRegistroProductos';
 import { Container, Button, Row, Col } from "react-bootstrap";
 import ModalEliminacionProducto from '../components/producto/ModalEliminacionProducto';
-import ModalEdicionProducto from '../components/producto/ModalActualizacionProducto';
+import ModalEdicionProducto from '../components/producto/ModalEdicionProductos';
 import CuadroBusquedas from '../components/busquedas/busquedas';
 
 const productos = () => {

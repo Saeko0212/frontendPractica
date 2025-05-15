@@ -39,7 +39,7 @@ const Tablaproducto = ({ productos, cargando, error,abrirModalEliminacion,totalE
             <td>{producto.nombre_producto}</td>
             <td>{producto.descripcion_producto || 'Sin descripción'}</td>
             <td>{producto.id_categoria}</td>
-            <td>{producto.precio_unitario.toFixed(2)}</td>
+            <td>C${producto.precio_unitario.toFixed(2)}</td>
             <td>{producto.stock}</td>
            <td>
   {producto.imagen ? (
