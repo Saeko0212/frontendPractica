@@ -12,6 +12,7 @@ import Usuarios from "./views/usuario";
 import Compras from "./views/Compras";
 import Empleados from "./views/Empleados";
 import Estadisticas from "./views/Estadisticas";
+import Dashboard from "./views/Dashboard";
 
 
 
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/compras" element={<Compras/>}/>
         <Route path="/empleados" element= {<Empleados/>}/>
         <Route path="/estadisticas" element={<Estadisticas/>}/>
+        <Route path="/dashboard" element={<Dashboard/>}/>
 
         </Routes>
       </main>
