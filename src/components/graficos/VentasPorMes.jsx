@@ -1,7 +1,7 @@
 import { Card } from "react-bootstrap";
 import { Bar } from 'react-chartjs-2';
 import Chart, { plugins, scales } from 'chart.js/auto';
-
+import { Pie } from 'react-chartjs-2';
 
 
 const VentasPorMes = ({ meses, totales_por_mes }) => {
@@ -11,8 +11,8 @@ const VentasPorMes = ({ meses, totales_por_mes }) => {
             {
                 label: 'ventas(C$)',
                 data: totales_por_mes,
-                backgroundColor: 'rgba(75, 192, 0.2)',
-                borderColor: 'rgba(75,192, 192,1)',
+                 backgroundColor: 'rgba(190, 192, 75, 0.2)',
+      borderColor: 'rgb(192, 124, 75)',
                 borderWidth: 1,
             }
         ]
