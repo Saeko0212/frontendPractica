@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Paginacion from '../ordenamiento/Paginacion';
 
 const Tablaproducto = ({ productos, cargando, error,abrirModalEliminacion,totalElementos,
-  elementosPorPagina, paginaActual, establecerPaginaActual, abrirModalEdicion }) => {
+  elementosPorPagina, paginaActual, establecerPaginaActual, abrirModalEdicion, generarPDFDetalleProducto }) => {
 
   if (cargando) {
     return <div>Cargando productos...</div>; // Muestra mensaje mientras carga
@@ -68,6 +68,15 @@ onClick={() => abrirModalEliminacion(producto)}
                   onClick={() => abrirModalEdicion(producto)}
                 >
                   <i className="bi bi-pencil"></i>
+                </Button>
+                <h>  </h>
+                <Button
+                variant='outline-secondary'
+                size="sm"
+                className="me-2"
+                onClick={()=> generarPDFDetalleProducto(producto)}>
+
+                <i className="bi bi-filetype-pdf"></i>
                 </Button>
 </td>           
           </tr>

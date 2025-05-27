@@ -250,6 +250,40 @@ doc.save(nombreArchivo);
 
   }
 
+  const generaPDFDetalleProducto = (producto) =>{
+    const pdf = new jsPDF();
+    const anchoPagina = pdf.internal.pageSize.getWidth();
+
+    //Encabezado 
+    pdf.setFillColor(28, 41, 51);
+    pdf.rect(0, 0, 220, 30, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(22);
+    pdf.text(producto.nombre_producto, anchoPagina/ 2, 18, {align: "center"});
+
+    let posicionY = 50;
+
+    if(producto.imagen){
+      const propiedadesImagen = pdf.getImageProperties(producto.imagen);
+      const anchoImagen = 108;
+      const altoImagen = (propiedadesImagen.height*anchoImagen)/propiedadesImagen.width;
+      const posicionX = (anchoPagina - anchoImagen)/ 2;
+
+      pdf.addImage(producto.imagen, 'JPEG', posicionX, 40, anchoImagen, altoImagen);
+      posicionY = 40 + altoImagen + 10;
+    }
+
+    pdf.setTextColor(0,0,0);
+    pdf.setFontSize(14);
+
+    pdf.text(`Descripcion: ${producto.descripcion_producto}`, anchoPagina/2, posicionY,{align:"center"});
+    pdf.text(`categoria: ${producto.id_categoria}`, anchoPagina/2, posicionY +10,{align: "center"});
+    pdf.text(`Precio: C$ ${producto.precio_unitario}`,anchoPagina/2, posicionY + 20,{align: "center"});
+    pdf.text(`Stock: ${producto.stock}`, anchoPagina / 2, posicionY + 38,{align: "center"});
+
+    pdf.save(`${producto.nombre_producto}.pdf`);
+  }
+
   return (
     <Container className="mt-5">
       <br />
