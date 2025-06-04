@@ -7,6 +7,8 @@ import ModalEdicionProducto from '../components/producto/ModalEdicionProductos';
 import CuadroBusquedas from '../components/busquedas/busquedas';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import {saveAs} from 'file-saver';
 
 const productos = () => {
   const [listaProductos, setListaProductos] = useState([]);
@@ -284,6 +286,36 @@ doc.save(nombreArchivo);
     pdf.save(`${producto.nombre_producto}.pdf`);
   }
 
+  //reportes de xlsx
+
+const exportarExcelProducto = () =>{
+  const datos = productosFiltrados.map((producto)=>({
+ID: producto.id_producto,
+Nombre: producto.nombre_producto,
+Descripcion: producto.descripcion_producto,
+id_categoria: producto.id_categoria,
+Precio: parseFloat(producto.precio_unitario),
+Stock: producto.stock
+  }));
+
+  const hoja = XLSX.utils.json_to_sheet(datos);
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'Productos');
+
+  const excelBuffer = XLSX.write(libro,{ bookType: 'xlsx', type: 'array'});
+
+
+  const fecha = new Date();
+  const dia = String(fecha.getDate()).padStart(2,'0');
+  const mes = String(fecha.getMonth()+1).padStart(2, '0');
+  const anio = fecha.getFullYear();
+
+  const nombreArchivo= `Productos_${dia}${mes}${anio}.xlsx`;
+
+  const blob = new Blob([excelBuffer],{type: 'aplication/octet-stream'});
+  saveAs(blob, nombreArchivo);
+}
+
   return (
     <Container className="mt-5">
       <br />
@@ -300,7 +332,7 @@ doc.save(nombreArchivo);
         manejarCambioBusqueda={manejarCambioBusqueda}
       />
     </Col>
-    <col lg={3} md={4} sm={4} xs={5}>
+    <Col lg={3} md={4} sm={4} xs={5}>
     <Button 
      className="mb-3"
      onClick={generarPDFProductos}
@@ -309,7 +341,15 @@ doc.save(nombreArchivo);
      >
       Generar reporte PDF
     </Button>
-    </col>
+    </Col>
+    <Col lg={3} md={4} sm={4} xs={5}>
+    <Button
+    className="mb-3"
+    onClick={exportarExcelProducto}
+    variant="secondary"
+style={{width: "100%"}}
+    >Generar Excel</Button>
+    </Col>
   </Row>
       <br/><br/>
 
@@ -323,6 +363,7 @@ doc.save(nombreArchivo);
           establecerPaginaActual={establecerPaginaActual} // Método para cambiar página
           abrirModalEliminacion={abrirModalEliminacion} // Método para abrir modal de eliminación
           abrirModalEdicion={abrirModalEdicion} // Método para abrir modal de edición
+          generarPDFDetalleProducto={generaPDFDetalleProducto}
           />
         
 <ModalEliminacionProducto
